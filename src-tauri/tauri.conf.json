@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "unifynet-budget-execution-system",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "identifier": "com.erwinaaquino.unifynet-budget-execution-system",
 
   "build": {
@@ -20,19 +20,19 @@
         "devtools": true
       }
     ],
-
     "security": {
       "csp": null
     }
   },
 
   "plugins": {
-   "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEU4RkNBOEE4MjdDRDhDREUKUldUZWpNMG5xS2o4NkNYSzRnNDFZTm5kYjN6QnpOVmF4VUppSW5qOVZkcGRpSEdwa245MDNUVGIK%",
+    "updater": {
+      "pubkey": "YOUR_ACTUAL_PUBLIC_KEY",
       "endpoints": [
         "https://github.com/easproxyz-boop/betatest-desktop-budget-execution/releases/latest/download/latest.json"
       ]
     },
+
     "deep-link": {
       "desktop": {
         "schemes": [
@@ -42,21 +42,17 @@
     }
   },
 
-
-"bundle": {
-  "createUpdaterArtifacts": true,
-  "active": true,
-  "targets": ["app"],
-  "category": "Productivity",
-  "icon": [
-    "icons/32x32.png",
-    "icons/128x128.png",
-    "icons/128x128@2x.png",
-    "icons/icon.icns",
-    "icons/icon.ico"
-  ]
-}
-
-
-  
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "createUpdaterArtifacts": true,
+    "category": "Productivity",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
 }
