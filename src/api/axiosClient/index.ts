@@ -1,0 +1,1 @@
+export { default as axiosClientAuthentication } from "./server-authentication";
