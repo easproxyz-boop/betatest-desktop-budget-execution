@@ -1,0 +1,37 @@
+example 1: update new version package.json
+
+{
+  "version": "0.2.1"
+}
+
+example 2:
+
+git add .
+git commit -m "Release v0.2.1"
+git push origin main
+
+
+example 3: create new tag
+
+git tag v0.2.1
+
+
+example 4: push origin
+
+git push origin v0.2.1
+
+
+
+
+//
+
+
+# 1. Update version
+# 2. Commit
+git add .
+git commit -m "Release v0.2.1"
+git push origin main
+
+# 3. Create release tag
+git tag v0.2.1
+git push origin v0.2.1
