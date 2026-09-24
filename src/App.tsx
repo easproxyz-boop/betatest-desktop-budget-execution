@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
+
 import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 import FormControl from "@mui/joy/FormControl";
@@ -9,13 +10,17 @@ import Button from "@mui/joy/Button";
 import Stack from "@mui/joy/Stack";
 import Alert from "@mui/joy/Alert";
 import Table from "@mui/joy/Table";
+
 import "./App.css";
 
-import { checkForUpdates } from "./updates/index.ts"
+import { checkForUpdates } from "./updates";
+import { insertTestRecord, getTestRecords } from "./api/test";
 
-
-import { insertTestRecord, getTestRecords } from "./api/test.ts";
-import type { ErrorResponse, TestRecordPayload, TestRecord } from "./types/api.ts";
+import type {
+  ErrorResponse,
+  TestRecordPayload,
+  TestRecord,
+} from "./types/api";
 
 type SubmitStatus =
   | { type: "idle" }
@@ -29,68 +34,98 @@ function App() {
     dt_lastname: "",
     dt_session: "",
   });
-  const [status, setStatus] = useState<SubmitStatus>({ type: "idle" });
+
+  const [status, setStatus] = useState<SubmitStatus>({
+    type: "idle",
+  });
+
   const [loading, setLoading] = useState(false);
 
   const [records, setRecords] = useState<TestRecord[]>([]);
+
   const [recordsLoading, setRecordsLoading] = useState(false);
 
   async function fetchRecords() {
     setRecordsLoading(true);
+
     try {
       const { data } = await getTestRecords();
+
       setRecords(data);
     } catch (err) {
-      console.error("Failed to fetch records", err);
+      console.error("Failed to fetch records:", err);
     } finally {
       setRecordsLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchRecords();
+    void fetchRecords();
+  }, []);
+
+  useEffect(() => {
+    void checkForUpdates();
   }, []);
 
   function handleChange(field: keyof TestRecordPayload) {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
-      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+      setForm((prev) => ({
+        ...prev,
+        [field]: e.target.value,
+      }));
     };
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     setLoading(true);
-    setStatus({ type: "idle" });
+
+    setStatus({
+      type: "idle",
+    });
 
     try {
       const { data } = await insertTestRecord(form);
 
-      setStatus({ type: "success", message: `${data.message} (id: ${data.insertId})` });
-      setForm({ dt_firstname: "", dt_middlename: "", dt_lastname: "", dt_session: "" });
-      fetchRecords(); // refresh the table after a successful insert
+      setStatus({
+        type: "success",
+        message: `${data.message} (id: ${data.insertId})`,
+      });
+
+      setForm({
+        dt_firstname: "",
+        dt_middlename: "",
+        dt_lastname: "",
+        dt_session: "",
+      });
+
+      await fetchRecords();
     } catch (err) {
       const axiosErr = err as AxiosError<ErrorResponse>;
 
       if (axiosErr.response) {
         setStatus({
           type: "error",
-          message: axiosErr.response.data?.message ?? "Something went wrong",
+          message:
+            axiosErr.response.data?.message ??
+            "Something went wrong",
         });
       } else if (axiosErr.request) {
-        setStatus({ type: "error", message: "Could not reach the server" });
+        setStatus({
+          type: "error",
+          message: "Could not reach the server",
+        });
       } else {
-        setStatus({ type: "error", message: axiosErr.message });
+        setStatus({
+          type: "error",
+          message: axiosErr.message,
+        });
       }
     } finally {
       setLoading(false);
     }
   }
-
-
-
-  useEffect(() => {
-  checkForUpdates();
-}, []);
 
   return (
     <main
@@ -112,13 +147,14 @@ function App() {
         }}
       >
         <Typography level="h3" sx={{ mb: 2 }}>
-          New Test Record --Updated By Erwin Aquino sept. 24, 2026
+          New Test Record (Updated By Erwin Aquino Developer)
         </Typography>
 
         <form onSubmit={handleSubmit}>
           <Stack spacing={2}>
             <FormControl required>
               <FormLabel>First name</FormLabel>
+
               <Input
                 value={form.dt_firstname}
                 onChange={handleChange("dt_firstname")}
@@ -128,6 +164,7 @@ function App() {
 
             <FormControl>
               <FormLabel>Middle name</FormLabel>
+
               <Input
                 value={form.dt_middlename}
                 onChange={handleChange("dt_middlename")}
@@ -137,6 +174,7 @@ function App() {
 
             <FormControl required>
               <FormLabel>Last name</FormLabel>
+
               <Input
                 value={form.dt_lastname}
                 onChange={handleChange("dt_lastname")}
@@ -146,6 +184,7 @@ function App() {
 
             <FormControl required>
               <FormLabel>Session</FormLabel>
+
               <Input
                 value={form.dt_session}
                 onChange={handleChange("dt_session")}
@@ -158,13 +197,18 @@ function App() {
                 {status.message}
               </Alert>
             )}
+
             {status.type === "error" && (
               <Alert color="danger" variant="soft">
                 {status.message}
               </Alert>
             )}
 
-            <Button type="submit" loading={loading} fullWidth>
+            <Button
+              type="submit"
+              loading={loading}
+              fullWidth
+            >
               Submit
             </Button>
           </Stack>
@@ -195,16 +239,23 @@ function App() {
               <th>Session</th>
             </tr>
           </thead>
+
           <tbody>
             {recordsLoading ? (
               <tr>
-                <td colSpan={5} style={{ textAlign: "center" }}>
+                <td
+                  colSpan={5}
+                  style={{ textAlign: "center" }}
+                >
                   Loading...
                 </td>
               </tr>
             ) : records.length === 0 ? (
               <tr>
-                <td colSpan={5} style={{ textAlign: "center" }}>
+                <td
+                  colSpan={5}
+                  style={{ textAlign: "center" }}
+                >
                   No records yet
                 </td>
               </tr>
