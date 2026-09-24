@@ -29,9 +29,9 @@ git push origin v0.2.1
 # 1. Update version
 # 2. Commit
 git add .
-git commit -m "Release v0.2.6"
+git commit -m "Release v0.2.7"
 git push origin main
 
 # 3. Create release tag
-git tag v0.2.6
-git push origin v0.2.6
+git tag v0.2.7
+git push origin v0.2.7
