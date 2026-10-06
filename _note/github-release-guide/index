@@ -31,15 +31,14 @@ git push origin v0.2.1
 # 3. Create release tag
 
 git add .
-git commit -m "Release v0.3.5"
+git commit -m "Release v0.3.6"
 git push origin main
-git tag v0.3.5
-git push origin v0.3.5
+git tag v0.3.6
+git push origin v0.3.6
 
 
 
 
 #
-
 cd src-tauri
 cargo update
