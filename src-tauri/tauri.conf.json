@@ -27,8 +27,7 @@
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEU4RkNBOEE4MjdDRDhDREUKUldUZWpNMG5xS2o4NkNYSzRnNDFZTm5kYjN6QnpOVmF4VUppSW5qOVZkcGRpSEdwa245MDNUVGIK",
-      "endpoints": ["https://github.com/easproxyz-boop/betatest-desktop-budget-execution/releases/latest/download/latest.json"],
-       "windows": { "installMode": "passive" }
+      "endpoints": ["https://github.com/easproxyz-boop/betatest-desktop-budget-execution/releases/latest/download/latest.json"]
     },
 
     "deep-link": {
