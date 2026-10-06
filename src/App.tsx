@@ -13,8 +13,11 @@ import Table from "@mui/joy/Table";
 
 import "./App.css";
 
-import { checkForUpdates } from "./updates";
 import { insertTestRecord, getTestRecords } from "./api/test";
+
+import type { Update } from "@tauri-apps/plugin-updater";
+import { checkForUpdates, installUpdate, type DownloadProgress } from "./updates";
+import UpdateModal from "./components/UpdateModal";
 
 import type {
   ErrorResponse,
@@ -45,6 +48,13 @@ function App() {
 
   const [recordsLoading, setRecordsLoading] = useState(false);
 
+  // ---- Auto update state ----
+  const [pendingUpdate, setPendingUpdate] = useState<Update | null>(null);
+  const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [installing, setInstalling] = useState(false);
+  const [updateProgress, setUpdateProgress] = useState<DownloadProgress | null>(null);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+
   async function fetchRecords() {
     setRecordsLoading(true);
 
@@ -63,9 +73,33 @@ function App() {
     void fetchRecords();
   }, []);
 
+  // Check for updates on app start, then show the modal if there is one
   useEffect(() => {
-    void checkForUpdates();
+    (async () => {
+      const update = await checkForUpdates();
+      if (update) {
+        setPendingUpdate(update);
+        setUpdateModalOpen(true);
+      }
+    })();
   }, []);
+
+  async function handleUpdateNow() {
+    if (!pendingUpdate) return;
+
+    setInstalling(true);
+    setUpdateError(null);
+    setUpdateProgress({ downloaded: 0, total: null });
+
+    try {
+      await installUpdate(pendingUpdate, setUpdateProgress);
+      // The app relaunches here, so nothing below runs on success.
+    } catch (err) {
+      console.error("Update failed:", err);
+      setUpdateError("Hindi na-install ang update. Subukan ulit mamaya.");
+      setInstalling(false);
+    }
+  }
 
   function handleChange(field: keyof TestRecordPayload) {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -204,11 +238,7 @@ function App() {
               </Alert>
             )}
 
-            <Button
-              type="submit"
-              loading={loading}
-              fullWidth
-            >
+            <Button type="submit" loading={loading} fullWidth>
               Submit
             </Button>
           </Stack>
@@ -243,19 +273,13 @@ function App() {
           <tbody>
             {recordsLoading ? (
               <tr>
-                <td
-                  colSpan={5}
-                  style={{ textAlign: "center" }}
-                >
+                <td colSpan={5} style={{ textAlign: "center" }}>
                   Loading...
                 </td>
               </tr>
             ) : records.length === 0 ? (
               <tr>
-                <td
-                  colSpan={5}
-                  style={{ textAlign: "center" }}
-                >
+                <td colSpan={5} style={{ textAlign: "center" }}>
                   No records yet
                 </td>
               </tr>
@@ -273,6 +297,16 @@ function App() {
           </tbody>
         </Table>
       </Sheet>
+
+      <UpdateModal
+        open={updateModalOpen}
+        update={pendingUpdate}
+        installing={installing}
+        progress={updateProgress}
+        error={updateError}
+        onUpdate={handleUpdateNow}
+        onLater={() => setUpdateModalOpen(false)}
+      />
     </main>
   );
 }
